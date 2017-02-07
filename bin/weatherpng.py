@@ -9,10 +9,10 @@ from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
 
-with open('../kindle/hourly10day.json') as json_hourlyforecast10day_data:
+with open('hourly10day.json') as json_hourlyforecast10day_data:
     hourlyforecast10day = json.load(json_hourlyforecast10day_data)
 
-with open('../kindle/conditions.json') as json_conditions_data:
+with open('conditions.json') as json_conditions_data:
     weatherconditions = json.load(json_conditions_data)
 
 forecastlabel="Today"
