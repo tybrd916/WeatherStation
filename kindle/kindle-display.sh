@@ -24,7 +24,7 @@ sleepfor2() {
         /usr/bin/rtcwake -s $1
 }
 sleepfor() {
-	lipc-set-prop com.lab126.powerd deferSuspend 3000000
+	#lipc-set-prop com.lab126.powerd deferSuspend 3000000
  	ENDWAIT=$(( $(currentTime) + $1 ))
  	date >> /mnt/us/kindle-display.log
 	echo "set sleep for $1 seconds" >> /mnt/us/kindle-display.log
