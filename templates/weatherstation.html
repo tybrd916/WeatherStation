@@ -1,0 +1,34 @@
+$def with (currtime, currtemp, forecastlabel, tHigh, tLow, kid, clothes)
+<html>
+<head>
+	<title>Tyler Weather App</title>
+	<link rel="stylesheet" type="text/css" href="static/normalize.css"/>
+	<link rel="stylesheet" type="text/css" href="static/weather.css"/>
+	<meta charset="utf-8">
+	<meta http-equiv="refresh" content="300">
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+	<script type="text/javascript">
+
+    </script>
+</head>
+<body class="weatherpersonback $kid$clothes">
+	<div class="leftpane">
+		<div id="outsidetemp">
+			<span class="time">$currtime</span><br/>
+			<span class="temp">$currtemp&#8457;</span><br/><br/><br/>
+			<span class="label">$forecastlabel High</span><br/>
+			<span class="temp">$tHigh&#8457;</span><br/>
+			<span class="label">$forecastlabel Low</span><br/>
+			<span class="temp">$tLow&#8457;</span><br/>
+		</div>
+		<!--<div id="target_hilo" class="grid-item"></div>
+		<div id="season" class="grid-item"></div>-->
+		<!--<div id="next_precipitation" class="grid-item"></div>-->
+	</div>
+	<!--<div class="rightpane">
+		<div id="kidpicture" class="weatherpersonparent">
+			<img src="static/WeatherGirl_Under50.png" class="weatherperson"/>
+		</div>
+	</div>-->
+</body>
+</html>

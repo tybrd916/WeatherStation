@@ -1,0 +1,161 @@
+<html>
+<head>
+	<title>Tyler Weather App</title>
+	<link rel="stylesheet" type="text/css" href="static/normalize.css"/>
+	<link rel="stylesheet" type="text/css" href="static/weather.css"/>
+	<link rel="stylesheet" type="text/css" href="static/jquery.mobile-1.4.5.css"/>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+	<script type="text/javascript" src="/static/jquery-2.2.4.js"></script>
+	<script type="text/javascript" src="/static/jquery.mobile-1.4.5.js"></script>
+	<script src="/static/masonry.pkgd.js"></script>
+	<script type="text/javascript">
+
+	var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+	var today = new Date();
+	var dayoffset = 1;
+	var classname="";
+
+	jQuery(document).ready(function() {
+	    if(today.getHours() <= 17){
+	    	dayoffset = 0;
+	    }
+
+		refreshData();
+	
+		setInterval(function(){refreshData();},300000);
+	});
+
+	jQuery( window ).on( "swipe", swipeChange);
+
+	function swipeChange(event){
+		if(classname==="alex"){
+			classname="helen";
+		} else {
+			classname="alex";
+		}
+		//alert("Swipe! "+classname);
+		refreshData();
+	}
+	
+	function refreshData(){
+	   jQuery.ajax('conditions', {
+		  success: function(data) {
+			 var weatherconditions = jQuery.parseJSON(data);
+			 jQuery("#outsidetemp").html("");
+			 jQuery("#outsidetemp").append("<h2>Now ("+days[ today.getDay() ]+"):</h2><h1>"+weatherconditions.current_observation.temp_f+"&#8457;</h1>");
+	
+			 jQuery.ajax('hourly10day', {
+				success: function(data) {
+				   var hourly10day = jQuery.parseJSON(data);
+	
+					var target = new Date();
+					target.setDate(today.getDate()+dayoffset);
+					var targetStr = ''
+						  + ('0' + (target.getMonth()+1)).slice(-2) + '/'
+					   + ('0' + target.getDate()).slice(-2) + '/'
+					 + target.getFullYear();
+					//alert("targetStr = "+targetStr);
+
+				    var targethigh = -1000;
+				    var targetlow = 1000;
+					jQuery.each(hourly10day.hourly_forecast, function(k,v){
+						var forecastdateStr = v.FCTTIME.mon_padded+"/"+v.FCTTIME.mday_padded+"/"+v.FCTTIME.year;
+						if(forecastdateStr === targetStr){
+							var hourlytemp = parseInt(v.temp.english);
+							if(hourlytemp > targethigh){
+								targethigh = hourlytemp;
+							}
+							if(hourlytemp < targetlow){
+								targetlow = hourlytemp;
+							}
+						}
+						jQuery("#target_hilo").html("");
+						//jQuery("#target_hilo").append("<h1>"+today.toDateString()+"<br/>"+today.toLocaleString()+"</h1>");
+						jQuery("#target_hilo")
+							.append("<h2><a onclick='javascript:changeDay();'>"+(dayoffset == 1 ? "Tomorrow ("+days[ target.getDay() ]+")" : "Today")+":</a><h2>")
+							.append("<h1>High: "+targethigh+"&#8457;</h1>")
+							.append("<h1>Low: "+targetlow+"&#8457;</h1>");
+					});
+
+					var classnum=1;
+					if(targethigh < 45){
+						classnum=1;
+					} else if (targethigh < 50){
+						classnum=2;
+					} else if (targethigh < 60){
+						classnum=3;
+					} else if (targethigh < 65){
+						classnum=4;
+					} else if (targethigh < 80){
+						classnum=5;
+					} else {
+						classnum=6;
+					}
+					//alert(window.location.pathname);
+					if(classname===""){
+						if(new String(window.location.pathname).replace("/","").length > 0){
+							classname=new String(window.location.pathname).replace("/","");
+						} else {
+							classname="alex"
+						}
+					}
+					if(classname==="alex"){
+						jQuery("#kidpicture").removeClass("helen"+classnum);
+					} else {
+						jQuery("#kidpicture").removeClass("alex"+classnum);
+					}
+					var imagename=classname+classnum;
+					jQuery("#kidpicture").addClass(imagename);
+					//alert(imagename);
+
+                    var season = "";
+					if(today.getMonth() < 3 || today.getMonth > 11){
+						season = "Winter";
+					}
+					if(today.getMonth() >= 3 || today.getMonth <= 5){
+						season = "Spring"
+					}
+					if(today.getMonth() >= 6 || today.getMonth <= 8){
+						season = "Summer"
+					}
+					if(today.getMonth() >= 9 || today.getMonth <= 11){
+						season = "Autumn"
+					}
+					jQuery("#season").html("");
+					jQuery("#season").append("<h2>Happy "+season+"</h2>");
+
+					jQuery('.grid').masonry({
+				   		// options
+				   		itemSelector: '.grid-item',
+				   		columnWidth: 260
+				 	});
+
+				}
+			 });
+		  }
+	   });
+	}
+
+	function changeDay(){
+		if(dayoffset == 0){
+			dayoffset = 1;
+			refreshData();
+		} else {
+			dayoffset = 0;
+			refreshData();
+		}
+	}
+
+</script>
+</head>
+<body>
+	<div class="grid">
+		<div id="target_hilo" class="grid-item"></div>
+		<div id="outsidetemp" class="grid-item"></div>
+		<div id="season" class="grid-item"></div>
+		<div id="kidpicture" class="grid-item weatherperson"/>
+		<div id="next_precipitation" class="grid-item"></div>
+	</div>
+</body>
+</html>
