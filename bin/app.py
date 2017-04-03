@@ -12,6 +12,13 @@ import io
 from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
+import sys
+
+if len(sys.argv) < 3:
+  print "You MUST supply a port and weatherunderground API key"
+  exit(2)
+
+apikey=sys.argv[2]
 
 #requests_cache.install_cache('weatherunderground_cache', backend='sqlite', expire_after=1800)
 
@@ -19,6 +26,8 @@ urls = (
   '/', 'Index', 
   '/alex', 'Index',
   '/helenback.html', 'helenback',
+  '/alexback.html', 'alexback',
+  '/alex.png', 'images',
   '/helen.png', 'images',
   '/helen.gif', 'images',
   '/helen.bmp', 'images',
@@ -64,14 +73,15 @@ class images:
             #print "file is new-ish, don't refresh!"
             downloadfreshdata=0
 
+        print "tyler sees APIKEY = "+apikey
         if downloadfreshdata > 0 :
-        	hourlyforecast10day = requests.get("http://api.wunderground.com/api/0ee0109ce52c6248/geolookup/hourly10day/q/VT/Williston.json").json()
+        	hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
                 with open('/home/pi/WeatherPython/hourly10day.json', 'w') as hourlyforecast10day_outfile:
                   json.dump(hourlyforecast10day, hourlyforecast10day_outfile)
 
         #with open('/Users/tcarr/WeatherPython/conditions.json') as json_conditions_data:
         #    weatherconditions = json.load(json_conditions_data)
-        	weatherconditions = requests.get("http://api.wunderground.com/api/0ee0109ce52c6248/geolookup/conditions/q/VT/Williston.json").json()
+        	weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
                 with open('/home/pi/WeatherPython/conditions.json', 'w') as conditions_outfile:
                   json.dump(weatherconditions, conditions_outfile)
         else:
@@ -101,8 +111,8 @@ class images:
             if float(hourlytemp) > float(targethigh):
               targethigh = hourlytemp
         kid="WeatherGirl"
-        #if str(web.ctx.path) == "/alex":
-        #  kid="alex"
+        if str(web.ctx.path) == "/alex.png":
+          kid="WeatherBoy"
         clothes=5
         testtemp = currtemp
         if int(currhour) > 16:
@@ -129,19 +139,21 @@ class images:
         labelfont = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf",30)
         temperaturefont = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf",110)
         notefont = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf",15)
-        #fontcolor=(0,0,0)
-        fontcolor=255
+        fontcolor=(0,0,0)
+        #fontcolor=255
         degreesymbol=u"\u00b0"
 
         # Opening the file gg.png
         imageFile = "static/"+kid+clothes
-        im1=Image.open(imageFile,mode='r')
+        im1=Image.open(imageFile)
         #http://terrylane.hopto.org:8080/helen.png
         im1.thumbnail((700,700), Image.ANTIALIAS)
 
-        #im2=Image.new("RGBA", (600, 800), (255,255,255))
-        im2=Image.new("L", (600, 800), 0)
-        im2.paste(im1,(300,100))
+        im2=Image.new("RGBA", (600, 800), (255,255,255))
+        #im2=Image.new("L", (600, 800), 255)
+        #print im2.mode+" "+im1.mode
+        im2.paste(im1,(250,100), mask=im1)
+        #im2.paste(im1,(300,100))
 
         # Drawing the text on the picture
         #draw = ImageDraw.Draw(im1)
@@ -173,13 +185,13 @@ class images:
 
 class Conditions(object):
     def GET(self):
-        weatherconditions = requests.get("http://api.wunderground.com/api/0ee0109ce52c6248/geolookup/conditions/q/VT/Williston.json").json()
+        weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
 
         return json.dumps(weatherconditions)
 
 class Hourly(object):
     def GET(self):
-        hourlyforecast10day = requests.get("http://api.wunderground.com/api/0ee0109ce52c6248/geolookup/hourly10day/q/VT/Williston.json").json()
+        hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
 
         return json.dumps(hourlyforecast10day)
 
@@ -187,10 +199,14 @@ class helenback(object):
     def GET(self):
         return render.helenback()
 
+class alexback(object):
+    def GET(self):
+        return render.alexback()
+
 class Index(object):
     def GET(self):
-        weatherconditions = requests.get("http://api.wunderground.com/api/0ee0109ce52c6248/geolookup/conditions/q/VT/Williston.json").json()
-        hourlyforecast10day = requests.get("http://api.wunderground.com/api/0ee0109ce52c6248/geolookup/hourly10day/q/VT/Williston.json").json()
+        weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
+        hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
 
         forecastlabel="Today"
         currhour = time.strftime("%H")
@@ -245,5 +261,5 @@ class Index(object):
         return render.weatherstation(currtime,currtemp,forecastlabel,targethigh,targetlow,kid,clothes)
 
 if __name__ == "__main__":
-    app.init()
+
     app.run()
