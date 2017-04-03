@@ -150,7 +150,7 @@ class images:
         im1.thumbnail((700,700), Image.ANTIALIAS)
 
         im2=Image.new("RGBA", (600, 800), (255,255,255))
-        #im2=Image.new("L", (600, 800), 255)
+        im4=Image.new("L", (600, 800), 255)
         #print im2.mode+" "+im1.mode
         im2.paste(im1,(250,100), mask=im1)
         #im2.paste(im1,(300,100))
@@ -167,14 +167,15 @@ class images:
         draw.text((20, 780),"last updated: "+currtime,fontcolor,font=notefont)
         draw = ImageDraw.Draw(im2)
 
-        im2.convert(mode='L')
+        im3 = im2.convert("P")
+        im4.paste(im3,(0,0))
         imgByteArr = io.BytesIO()
         if ext == ".gif":
-          im2.save(imgByteArr, format='GIF')
+          im4.save(imgByteArr, format='GIF')
         elif ext == ".bmp":
-          im2.save(imgByteArr, format='BMP')
+          im4.save(imgByteArr, format='BMP')
         else:
-          im2.save(imgByteArr, format='PNG')
+          im4.save(imgByteArr, format='PNG')
         return imgByteArr.getvalue()
 
         # Save the image with a new name
