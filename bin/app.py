@@ -12,6 +12,7 @@ import io
 from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
+from PIL import ImageOps
 import sys
 
 if len(sys.argv) < 3:
@@ -155,6 +156,12 @@ class images:
         im2.paste(im1,(250,100), mask=im1)
         #im2.paste(im1,(300,100))
 
+        #Resolve battery level if passed
+        param_data = web.input(batterylevel=None)
+        batterypercent=None
+        if param_data.batterylevel != None:
+          batterypercent=param_data.batterylevel
+
         # Drawing the text on the picture
         #draw = ImageDraw.Draw(im1)
         draw = ImageDraw.Draw(im2)
@@ -165,17 +172,21 @@ class images:
         draw.text((20, 400),forecastlabel+" Low",fontcolor,font=labelfont)
         draw.text((20, 430),str(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 780),"last updated: "+currtime,fontcolor,font=notefont)
+        if batterypercent != None:
+          draw.text((450,780),"Battery: "+batterypercent+"%",fontcolor,font=notefont)
         draw = ImageDraw.Draw(im2)
 
-        im3 = im2.convert("P")
-        im4.paste(im3,(0,0))
+        im2 = im2.convert("L")
+        if batterypercent != None and batterypercent < 20:
+          im2 = ImageOps.mirror(im2)
+        im4.paste(im2,(0,0))
         imgByteArr = io.BytesIO()
         if ext == ".gif":
-          im4.save(imgByteArr, format='GIF')
+          im2.save(imgByteArr, format='GIF')
         elif ext == ".bmp":
-          im4.save(imgByteArr, format='BMP')
+          im2.save(imgByteArr, format='BMP')
         else:
-          im4.save(imgByteArr, format='PNG')
+          im2.save(imgByteArr, format='PNG')
         return imgByteArr.getvalue()
 
         # Save the image with a new name
