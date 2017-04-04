@@ -162,7 +162,7 @@ class images:
         draw.text((20, 50),currtemp+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 200),forecastlabel+" High",fontcolor,font=labelfont)
         draw.text((20, 230),str(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
-        draw.text((20, 400),forecastlabel+" Temperature",fontcolor,font=labelfont)
+        draw.text((20, 400),forecastlabel+" Low",fontcolor,font=labelfont)
         draw.text((20, 430),str(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 780),"last updated: "+currtime,fontcolor,font=notefont)
         draw = ImageDraw.Draw(im2)
