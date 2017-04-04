@@ -2,7 +2,8 @@
 
 sleeptest=1
 sleeptime=120 #seconds
-url="http://terrylane.hopto.org:8080/helen.png"
+batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
+url="http://terrylane.hopto.org:8080/helen.png?batterylevel=$batterypercent"
 tmp_image="/mnt/us/extensions/tyler/helen.png"
 returnval=0
 newState=""
