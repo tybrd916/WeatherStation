@@ -2,12 +2,17 @@
 
 sleeptest=1
 sleeptime=120 #seconds
-batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
-url="http://terrylane.hopto.org:8080/helen.png?batterylevel=$batterypercent"
-tmp_image="/mnt/us/extensions/tyler/helen.png"
+kidname=helen.png
+tmp_image="/mnt/us/extensions/tyler/$kidname"
 returnval=0
 newState=""
 currentState=""
+
+getUrl(){	
+	batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
+	url="http://terrylane.hopto.org:8080/$kidname?batterylevel=$batterypercent"
+	echo $url
+}
 
 currentTime() {
 	date +%s
@@ -16,10 +21,11 @@ currentTime() {
 wifienable() {
 	date >> /mnt/us/kindle-display.log
 	echo "wifienable" >> /mnt/us/kindle-display.log
-	lipc-set-prop com.lab126.cmd wirelessEnable 1
+	#lipc-set-prop com.lab126.cmd wirelessEnable 1
 }
 wifidisable() {
-	lipc-set-prop com.lab126.cmd wirelessEnable 0
+	echo "wifidisable" >> /mnt/us/kindle-display.log
+	#lipc-set-prop com.lab126.cmd wirelessEnable 0
 }
 sleepfor2() {
         /usr/bin/rtcwake -s $1
@@ -70,13 +76,13 @@ wait_for_state_change() {
 
 screen_saver_update(){
 	date >> /mnt/us/kindle-display.log
-	echo "get helen png in state ($currentState)" >> /mnt/us/kindle-display.log
-	curl $url > $tmp_image 2>/dev/null
+	echo "get $kidname in state ($currentState)" >> /mnt/us/kindle-display.log
+	curl $(getUrl) > $tmp_image 2>/dev/null
 	## 2>> /mnt/us/kindle-display.log
-	/mnt/us/extensions/tyler/setscreensaver.sh helen.png
+	/mnt/us/extensions/tyler/setscreensaver.sh $kidname
 	#wget -O $tmp_image $url
 	if [[ "$currentState" == "Screen Saver" ]] ; then
-		eips -g /mnt/us/extensions/tyler/helen.png
+		eips -g /mnt/us/extensions/tyler/$kidname
 	fi
 }
 
