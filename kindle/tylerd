@@ -13,5 +13,5 @@ if [[ $isrunning -le 0 ]] ; then
   if [[ -f /mnt/us/extensions/tyler/newscript ]] ; then
     mv /mnt/us/extensions/tyler/newscript /mnt/us/extensions/tyler/kindle-display.sh
   fi
-#  /mnt/us/extensions/tyler/kindle-display.sh &
+  /mnt/us/extensions/tyler/kindle-display.sh &
 fi
