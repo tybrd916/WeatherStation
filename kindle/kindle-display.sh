@@ -2,13 +2,13 @@
 
 sleeptest=1
 sleeptime=120 #seconds
-kidname=helen.png
+kidname=$(cat /mnt/us/extensions/tyler/picname.txt)
 tmp_image="/mnt/us/extensions/tyler/$kidname"
 returnval=0
 newState=""
 currentState=""
 
-getUrl(){	
+getImageUrl(){	
 	batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
 	url="http://terrylane.hopto.org:8080/$kidname?batterylevel=$batterypercent"
 	echo $url
@@ -74,10 +74,26 @@ wait_for_state_change() {
 	fi
 }
 
+script_self_update(){
+	curl http://terrylane.hopto.org:8080/static/kindle-display.sh > /mnt/us/extensions/tyler/newscript 2>/dev/null
+	newmd5=$(md5sum /mnt/us/extensions/tyler/newscript|cut -d " " -f1)
+	oldmd5=$(md5sum /mnt/us/extensions/tyler/kindle-display.sh|cut -d " " -f1)
+	if [[ "$newmd5" != "$oldmd5" ]] ; then
+		#Restart this script with new version
+		date >> /mnt/us/kindle-display.log
+		echo "Restart kindle-display.sh new version ($oldmd5 vs $newmd5)" >> /mnt/us/kindle-display.log
+		cp -p /mnt/us/extensions/tyler/newscript /mnt/us/extensions/kindle-display.sh
+		/mnt/us/extensions/tyler/tylerd -f &
+		exit 0;
+	fi
+}
+
 screen_saver_update(){
+	script_self_update
+	kidname=$(cat /mnt/us/extensions/tyler/picname.txt)
 	date >> /mnt/us/kindle-display.log
 	echo "get $kidname in state ($currentState)" >> /mnt/us/kindle-display.log
-	curl $(getUrl) > $tmp_image 2>/dev/null
+	curl $(getImageUrl) > $tmp_image 2>/dev/null
 	## 2>> /mnt/us/kindle-display.log
 	/mnt/us/extensions/tyler/setscreensaver.sh $kidname
 	#wget -O $tmp_image $url
@@ -88,7 +104,7 @@ screen_saver_update(){
 
 while true;
 do
-	while wait_for_state_change; do sleep 2; done
+	while wait_for_state_change; do sleep 1; done
 #	sleepflag=$(cat /mnt/us/extensions/tyler/sleepflag)
 #	if [[ "$sleepflag" == "1" ]] ; then
 #		echo "woke from suspend sleepflag 1" >> /mnt/us/kindle-display.log
@@ -100,12 +116,12 @@ do
 
 	if [[ "$currentState" == "Active" || "$currentState" == "Screen Saver" ]] ; then
 		wifienable
-		while wait_for_wifi; do sleep 5; done
+		while wait_for_wifi; do sleep 2; done
 		screen_saver_update
 	elif [[ "$currentState" == "Ready to suspend" ]] ; then
 		date >> /mnt/us/kindle-display.log
 		echo "wait for suspend" >> /mnt/us/kindle-display.log
-		while wait_for_ready_suspend; do sleep 5; done
+		while wait_for_ready_suspend; do sleep 3; done
             	##lipc-set-prop -i com.lab126.powerd rtcWakeup 60 >> /mnt/us/kindle-display.log 2>&1
 		echo "1" > /mnt/us/extensions/tyler/sleepflag
 		sleepfor $sleeptime
