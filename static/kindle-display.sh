@@ -1,0 +1,1 @@
+../kindle/kindle-display.sh
