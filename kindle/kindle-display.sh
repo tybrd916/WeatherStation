@@ -2,7 +2,7 @@
 
 sleeptest=1
 sleeptime=120 #seconds
-kidname=alex.png
+kidname=$(cat /mnt/us/extensions/tyler/picname.txt)
 tmp_image="/mnt/us/extensions/tyler/$kidname"
 returnval=0
 newState=""
@@ -75,14 +75,14 @@ wait_for_state_change() {
 }
 
 script_self_update(){
-	curl http://terrylane.hopto.org:8080/static/kindle-display.sh > /mnt/us/extensions/tyler/newscript
+	curl http://terrylane.hopto.org:8080/static/kindle-display.sh > /mnt/us/extensions/tyler/newscript 2>/dev/null
 	newmd5=$(md5sum /mnt/us/extensions/tyler/newscript|cut -d " " -f1)
 	oldmd5=$(md5sum /mnt/us/extensions/tyler/kindle-display.sh|cut -d " " -f1)
 	if [[ "$newmd5" != "$oldmd5" ]] ; then
 		#Restart this script with new version
 		date >> /mnt/us/kindle-display.log
 		echo "Restart kindle-display.sh new version ($oldmd5 vs $newmd5)" >> /mnt/us/kindle-display.log
-		mv /mnt/us/extensions/tyler/newscript /mnt/us/extensions/kindle-display.sh
+		cp -p /mnt/us/extensions/tyler/newscript /mnt/us/extensions/kindle-display.sh
 		/mnt/us/extensions/tyler/tylerd -f &
 		exit 0;
 	fi
@@ -90,6 +90,7 @@ script_self_update(){
 
 screen_saver_update(){
 	script_self_update
+	kidname=$(cat /mnt/us/extensions/tyler/picname.txt)
 	date >> /mnt/us/kindle-display.log
 	echo "get $kidname in state ($currentState)" >> /mnt/us/kindle-display.log
 	curl $(getImageUrl) > $tmp_image 2>/dev/null
