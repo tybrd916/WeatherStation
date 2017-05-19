@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sleeptest=1
-sleeptime=120 #seconds
+sleeptime=180 #seconds
 kidname=$(cat /mnt/us/extensions/tyler/picname.txt)
 tmp_image="/mnt/us/extensions/tyler/$kidname"
 returnval=0
@@ -10,7 +10,7 @@ currentState=""
 
 getImageUrl(){	
 	batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
-	url="http://terrylane.hopto.org:8080/$kidname?batterylevel=$batterypercent"
+	url="http://8.0.0.27:8080/$kidname?batterylevel=$batterypercent"
 	echo $url
 }
 
@@ -75,7 +75,7 @@ wait_for_state_change() {
 }
 
 script_self_update(){
-	curl http://terrylane.hopto.org:8080/static/kindle-display.sh > /mnt/us/extensions/tyler/newscript 2>/dev/null
+	curl http://8.0.0.27:8080/static/kindle-display.sh > /mnt/us/extensions/tyler/newscript 2>/dev/null
 	newmd5=$(md5sum /mnt/us/extensions/tyler/newscript|cut -d " " -f1)
 	oldmd5=$(md5sum /mnt/us/extensions/tyler/kindle-display.sh|cut -d " " -f1)
 	if [[ "$newmd5" != "$oldmd5" ]] ; then
