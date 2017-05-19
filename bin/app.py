@@ -126,14 +126,14 @@ class images:
           clothes="_Under35.png"
         elif float(testtemp) < 50:
           clothes="_Under50.png"
-        elif float(testtemp) >= 50:
-          clothes="_Over50.png"
-        elif float(testtemp) >= 60:
-          clothes="_Over60.png"
-        elif float(testtemp) >= 65:
-          clothes="_Over65.png"
         elif float(testtemp) >= 80:
           clothes="Over80.png"
+        elif float(testtemp) >= 65:
+          clothes="_Over65.png"
+        elif float(testtemp) >= 60:
+          clothes="_Over60.png"
+        elif float(testtemp) >= 50:
+          clothes="_Over50.png"
 
         # Loading Fonts.
         # To the font you want to use.
