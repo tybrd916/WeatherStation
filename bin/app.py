@@ -102,10 +102,17 @@ class images:
         currtemp = str(weatherconditions["current_observation"]["temp_f"])
         targethigh = -1000;
         targetlow = 1000;
+        if int(currhour) > 12 and int(currhour) < 16:
+          noonhour=currhour
+        else:
+          noonhour=12
+        noontemp=currtemp
         for i, entry in enumerate(hourlyforecast10day["hourly_forecast"]):
           hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if hdate == targetdatestr:
             hourlytemp = entry['temp']['english']
+            if entry['FCTTIME']['hour_padded'] == noonhour:
+              noontemp=hourlytemp
             #print hourlytemp
             if float(hourlytemp) < float(targetlow):
               targetlow = hourlytemp
@@ -115,12 +122,13 @@ class images:
         if str(web.ctx.path) == "/alex.png":
           kid="WeatherBoy"
         clothes=5
-        testtemp = currtemp
-        if int(currhour) > 16:
-          if float(targetlow) < 45:
-            testtemp = targetlow
-          else:
-            testtemp = targethigh
+        testtemp=noontemp
+        #testtemp = currtemp
+        #if int(currhour) > 16:
+        #  if float(targetlow) < 45:
+        #    testtemp = targetlow
+        #  else:
+        #    testtemp = targethigh
         #print testtemp
         if float(testtemp) < 35:
           clothes="_Under35.png"
