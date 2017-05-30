@@ -16,7 +16,7 @@ from PIL import ImageOps
 import numpy
 import sys
 import matplotlib
-matplotlib.use("pdf")
+matplotlib.use("agg")
 import matplotlib.pyplot as plt
 
 if len(sys.argv) < 3:
@@ -169,12 +169,20 @@ class images:
         #print "Before Plot attempt"
         plt.plot(timelist, preciplist)
         #print "Auto Plot attempt"
-        fig = plt.gcf()
-        fig.set_size_inches(18.5, 10.5)
+        #fig = plt.gcf()
+        fig = plt.figure(figsize=(5,2), frameon=False)
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.axis('off')
+        
+        ax.plot(preciplist)
+        
+        with open('test.png', 'w') as outfile:
+          fig.canvas.print_png(outfile)
+        fig.set_size_inches(3, 1)
         fig.autofmt_xdate()
         #fig.draw()
         #buffer = StringIO.StringIO()
-        #plotImage = fig2img(fig)
+        plotImage = fig2img(fig)
         #pil_image.save(buffer, 'PNG')
         plt.xlabel('Precipitation Chance')
         plt.ylabel('Date/Time')
@@ -225,7 +233,8 @@ class images:
         #print im2.mode+" "+im1.mode
         im2.paste(im1,(250,100), mask=im1)
         #im2.paste(im1,(300,100))
-        #im2.paste(plotImage,5,5) #, mask=plotImage) #plot debug
+        #plotImage.thumbnail((200,300), Image.ANTIALIAS)
+        im2.paste(plotImage,(5,650), mask=plotImage) #plot debug
 
         #Resolve battery level if passed
         param_data = web.input(batterylevel=None)
