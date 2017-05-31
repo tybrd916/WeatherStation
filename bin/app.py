@@ -145,6 +145,7 @@ class images:
         epochlist=[]
         preciplist=[]
         templist=[]
+        firsthour=hourlyforecast10day["hourly_forecast"][0]['FCTTIME']['hour_padded']
         for i, entry in enumerate(hourlyforecast10day["hourly_forecast"]):
           hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if i <= 72:
@@ -186,6 +187,17 @@ class images:
         #fig.set_size_inches(3, 1)
         fig.autofmt_xdate()
         plotImage = fig2img(fig)
+        plotImage = plotImage.convert("RGBA")
+        datas = plotImage.getdata()
+        
+        newData = []
+        for item in datas:
+            if item[0] == 255 and item[1] == 255 and item[2] == 255:
+                newData.append((255, 255, 255, 0))
+            else:
+                newData.append(item)
+        
+        plotImage.putdata(newData)
         
         kid="WeatherGirl"
         if str(web.ctx.path) == "/alex.png":
@@ -232,6 +244,27 @@ class images:
         #print im2.mode+" "+im1.mode
         #im2.paste(im1,(300,100))
         #plotImage.thumbnail((200,300), Image.ANTIALIAS)
+        draw = ImageDraw.Draw(im2)
+
+        barwidth=6.5
+        graphbackoffset=95
+        nightRectWidth=float(barwidth)*11
+        if firsthour < 6:
+          nightRectWidth = float(barwidth)*(6-int(firsthour))
+        elif firsthour > 18: #Graph Forecast starts in night-time
+          nightRectWidth = float(barwidth)*(6+(24-int(firsthour)))
+        elif firsthour <= 18:
+          graphbackoffset=graphbackoffset+(float(barwidth)*(18-int(firsthour)))
+        draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
+        graphbackoffset=graphbackoffset+nightRectWidth+(float(barwidth)*13)
+        nightRectWidth=float(barwidth)*11
+        draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
+        graphbackoffset=graphbackoffset+nightRectWidth+(float(barwidth)*13)
+        nightRectWidth=float(barwidth)*11
+        draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
+        graphbackoffset=graphbackoffset+nightRectWidth+(float(barwidth)*13)
+        nightRectWidth=float(barwidth)*11
+        draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
         im2.paste(plotImage,(5,550), mask=plotImage) #plot debug
         im2.paste(im1,(350,0), mask=im1)
 
@@ -243,7 +276,6 @@ class images:
 
         # Drawing the text on the picture
         #draw = ImageDraw.Draw(im1)
-        draw = ImageDraw.Draw(im2)
         draw.text((20, 20),"Recent Temperature",fontcolor,font=labelfont)
         draw.text((20, 50),currtemp+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 200),forecastlabel+" High",fontcolor,font=labelfont)
