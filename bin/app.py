@@ -144,14 +144,16 @@ class images:
         timelist=[]
         epochlist=[]
         preciplist=[]
+        templist=[]
         for i, entry in enumerate(hourlyforecast10day["hourly_forecast"]):
           hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if i <= 72:
             timelist.append(datetime.datetime.fromtimestamp(float(entry['FCTTIME']['epoch'])))
             epochlist.append(float(entry['FCTTIME']['epoch']))
             preciplist.append(float(entry['pop']))
+            templist.append(float(entry['temp']['english']))
             #tylerfile.write("Tyler sees:\n"+datetime.datetime.fromtimestamp(float(entry['FCTTIME']['epoch'])).strftime('%c'))
-            #tylerfile.write("Tyler sees:\n"+str(entry))
+            tylerfile.write("Tyler sees:\n"+str(entry))
           if hdate == targetdatestr:
             hourlytemp = entry['temp']['english']
             if entry['FCTTIME']['hour_padded'] == noonhour:
@@ -164,30 +166,27 @@ class images:
 
         #time_format = '%Y-%m-%d %H:%M'
         #timelist2=[datetime.datetime.strftime(i, time_format) for i in timelist]
-        tylerfile.write(str(timelist)+"\n")
-        tylerfile.write(str(preciplist)+"\n")
+        #tylerfile.write(str(timelist)+"\n")
+        #tylerfile.write(str(preciplist)+"\n")
         #print "Before Plot attempt"
-        plt.plot(timelist, preciplist)
+        plt = None
+        plt = matplotlib.pyplot
+        #plt.plot(timelist, preciplist)
         #print "Auto Plot attempt"
         #fig = plt.gcf()
-        fig = plt.figure(figsize=(5,2), frameon=False)
-        ax = fig.add_axes([0, 0, 1, 1])
-        ax.axis('off')
-        
-        ax.plot(preciplist)
-        
-        with open('test.png', 'w') as outfile:
-          fig.canvas.print_png(outfile)
-        fig.set_size_inches(3, 1)
-        fig.autofmt_xdate()
-        #fig.draw()
-        #buffer = StringIO.StringIO()
-        plotImage = fig2img(fig)
-        #pil_image.save(buffer, 'PNG')
-        plt.xlabel('Precipitation Chance')
-        plt.ylabel('Date/Time')
-        plt.savefig('precipitationForecast.png')
+        fig = plt.figure(figsize=(6.5,2), dpi=100, frameon=False)
+        axTemp = fig.add_axes([0.1, 0.05, .8, .9])
+        #axPrecip.axis('off')
+        axTemp.plot(templist,color="black")
 
+        axPrecip = axTemp.twinx()
+        y_pos = numpy.arange(len(preciplist))
+        axPrecip.bar(y_pos, preciplist, align="center")
+        
+        #fig.set_size_inches(3, 1)
+        fig.autofmt_xdate()
+        plotImage = fig2img(fig)
+        
         kid="WeatherGirl"
         if str(web.ctx.path) == "/alex.png":
           kid="WeatherBoy"
@@ -226,15 +225,15 @@ class images:
         imageFile = "static/"+kid+clothes
         im1=Image.open(imageFile)
         #http://terrylane.hopto.org:8080/helen.png
-        im1.thumbnail((700,700), Image.ANTIALIAS)
+        im1.thumbnail((575,575), Image.ANTIALIAS)
 
         im2=Image.new("RGBA", (600, 800), (255,255,255))
         im4=Image.new("L", (600, 800), 255)
         #print im2.mode+" "+im1.mode
-        im2.paste(im1,(250,100), mask=im1)
         #im2.paste(im1,(300,100))
         #plotImage.thumbnail((200,300), Image.ANTIALIAS)
-        im2.paste(plotImage,(5,650), mask=plotImage) #plot debug
+        im2.paste(plotImage,(5,550), mask=plotImage) #plot debug
+        im2.paste(im1,(350,0), mask=im1)
 
         #Resolve battery level if passed
         param_data = web.input(batterylevel=None)
