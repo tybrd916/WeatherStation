@@ -183,6 +183,7 @@ class images:
         axPrecip = axTemp.twinx()
         y_pos = numpy.arange(len(preciplist))
         axPrecip.bar(y_pos, preciplist, align="center")
+        axPrecip.set_ylim([0,100])
         
         #fig.set_size_inches(3, 1)
         fig.autofmt_xdate()
