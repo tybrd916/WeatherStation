@@ -250,20 +250,21 @@ class images:
         barwidth=6.5
         graphbackoffset=95
         nightRectWidth=float(barwidth)*11
-        if firsthour < 6:
+        dayRectWidth=float(barwidth)*13
+        if int(firsthour) < 6:
           nightRectWidth = float(barwidth)*(6-int(firsthour))
-        elif firsthour > 18: #Graph Forecast starts in night-time
+        elif int(firsthour) > 18: #Graph Forecast starts in night-time
           nightRectWidth = float(barwidth)*(6+(24-int(firsthour)))
-        elif firsthour <= 18:
+        elif int(firsthour) <= 18:
           graphbackoffset=graphbackoffset+(float(barwidth)*(18-int(firsthour)))
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
-        graphbackoffset=graphbackoffset+nightRectWidth+(float(barwidth)*13)
+        graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
         nightRectWidth=float(barwidth)*11
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
-        graphbackoffset=graphbackoffset+nightRectWidth+(float(barwidth)*13)
+        graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
         nightRectWidth=float(barwidth)*11
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
-        graphbackoffset=graphbackoffset+nightRectWidth+(float(barwidth)*13)
+        graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
         nightRectWidth=float(barwidth)*11
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
         im2.paste(plotImage,(5,550), mask=plotImage) #plot debug
