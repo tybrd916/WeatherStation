@@ -5,9 +5,8 @@ import json
 import requests
 import re
 import os
-#print dir(requests)
-#import requests_cache
-import PIL
+# print dir(requests)
+# import requests_cache
 import io
 from PIL import ImageFont
 from PIL import Image
@@ -17,23 +16,24 @@ import numpy
 import sys
 import matplotlib
 matplotlib.use("agg")
-import matplotlib.pyplot as plt
 
 if len(sys.argv) < 3:
-  print "You MUST supply a port and weatherunderground API key"
-  exit(2)
+    print "You MUST supply a port and weatherunderground API key"
+    exit(2)
 
-apikey=sys.argv[2]
+apikey = sys.argv[2]
 
-def fig2data ( fig ):
+
+def fig2data(fig):
     """
-    @brief Convert a Matplotlib figure to a 4D numpy array with RGBA channels and return it
+    @brief Convert a Matplotlib figure to a 4D numpy
+    array with RGBA channels and return it
     @param fig a matplotlib figure
     @return a numpy 3D array of RGBA values
     """
     # draw the renderer
-    fig.canvas.draw ( )
- 
+    fig.canvas.draw()
+
     # Get the RGBA buffer from the figure
     w,h = fig.canvas.get_width_height()
     buf = numpy.fromstring ( fig.canvas.tostring_argb(), dtype=numpy.uint8 )
@@ -157,7 +157,7 @@ class images:
             tylerfile.write("Tyler sees:\n"+str(entry))
           if hdate == targetdatestr:
             hourlytemp = entry['temp']['english']
-            if entry['FCTTIME']['hour_padded'] == noonhour:
+            if int(entry['FCTTIME']['hour_padded']) == int(noonhour):
               noontemp=hourlytemp
             #print hourlytemp
             if float(hourlytemp) < float(targetlow):
