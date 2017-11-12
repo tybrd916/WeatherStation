@@ -3,3 +3,4 @@ bin/app.pyc
 conditions.json
 hourly10day.json
 nohup.out
+webpy.log
