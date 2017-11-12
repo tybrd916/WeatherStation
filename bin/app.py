@@ -265,6 +265,7 @@ class images:
         barwidth=6.5
         graphbackoffset=95
         weekdaysOffset=95
+        dayOffset=1
         nightRectWidth=float(barwidth)*11
         dayRectWidth=float(barwidth)*13
         if int(firsthour) < 6:
@@ -275,7 +276,8 @@ class images:
           weekdaysOffset=int(weekdaysOffset+nightRectWidth)
         elif int(firsthour) <= 18:
           graphbackoffset=graphbackoffset+(float(barwidth)*(18-int(firsthour)))
-          weekdaysOffset=int(weekdaysOffset+(float(barwidth)*(18-int(firsthour))))
+          weekdaysOffset=int(weekdaysOffset+(float(barwidth)*(18-int(firsthour))))+nightRectWidth
+          dayOffset=2
 
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
         graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
@@ -299,9 +301,9 @@ class images:
         # Drawing the text on the picture
         #draw = ImageDraw.Draw(im1)
 
-        labeldate1 = targetdate + datetime.timedelta(days=1)
-        labeldate2 = targetdate + datetime.timedelta(days=2)
-        labeldate3 = targetdate + datetime.timedelta(days=3)
+        labeldate1 = targetdate + datetime.timedelta(days=int(dayOffset))
+        labeldate2 = targetdate + datetime.timedelta(days=int(dayOffset)+1)
+        labeldate3 = targetdate + datetime.timedelta(days=int(dayOffset)+2)
         draw.text((int(weekdaysOffset)+30,750),weekday_abbrevs[labeldate1.weekday()],fontcolor,font=notefont)
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate2.weekday()],fontcolor,font=notefont)
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate3.weekday()],fontcolor,font=notefont)
