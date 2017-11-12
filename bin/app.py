@@ -18,11 +18,14 @@ import matplotlib
 matplotlib.use("agg")
 import matplotlib.pyplot as plt
 
-if len(sys.argv) < 3:
-    print "You MUST supply a port and weatherunderground API key"
+workingDir='/Users/tcarr/'
+
+if len(sys.argv) < 4:
+    print "You MUST supply a port and weatherunderground API key and working directory"
     exit(2)
 
 apikey = sys.argv[2]
+workingDir= sys.argv[3]
 
 
 def fig2data(fig):
@@ -54,7 +57,7 @@ def fig2img ( fig ):
     # put the figure pixmap into a numpy array
     buf = fig2data ( fig )
     w, h, d = buf.shape
-    return Image.fromstring( "RGBA", ( w ,h ), buf.tostring( ) )
+    return Image.frombytes( "RGBA", ( w ,h ), buf.tostring( ) )
 
 #requests_cache.install_cache('weatherunderground_cache', backend='sqlite', expire_after=1800)
 
@@ -103,27 +106,27 @@ class images:
 
         downloadfreshdata=1
         now = time.time()
-        #with open('/home/pi/WeatherStation/hourly10day.json', 'w') as hourlyforecast10day_outfile:
-        if os.path.isfile('/home/pi/WeatherStation/hourly10day.json'):
-          if os.stat('/home/pi/WeatherStation/hourly10day.json').st_mtime > now - 3600:
+        #with open(str(workingDir)+'WeatherStation/hourly10day.json', 'w') as hourlyforecast10day_outfile:
+        if os.path.isfile(str(workingDir)+'WeatherStation/hourly10day.json'):
+          if os.stat(str(workingDir)+'WeatherStation/hourly10day.json').st_mtime > now - 3600:
             #print "file is new-ish, don't refresh!"
             downloadfreshdata=0
 
         print "tyler sees APIKEY = "+apikey
         if downloadfreshdata > 0 :
         	hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
-                with open('/home/pi/WeatherStation/hourly10day.json', 'w') as hourlyforecast10day_outfile:
+                with open(str(workingDir)+'WeatherStation/hourly10day.json', 'w') as hourlyforecast10day_outfile:
                   json.dump(hourlyforecast10day, hourlyforecast10day_outfile)
 
         #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
         #    weatherconditions = json.load(json_conditions_data)
         	weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
-                with open('/home/pi/WeatherStation/conditions.json', 'w') as conditions_outfile:
+                with open(str(workingDir)+'WeatherStation/conditions.json', 'w') as conditions_outfile:
                   json.dump(weatherconditions, conditions_outfile)
         else:
-             with open('/home/pi/WeatherStation/hourly10day.json') as json_hourlyforecast10day_data:
+             with open(str(workingDir)+'WeatherStation/hourly10day.json') as json_hourlyforecast10day_data:
                hourlyforecast10day = json.load(json_hourlyforecast10day_data)
-             with open('/home/pi/WeatherStation/conditions.json') as json_conditions_data:
+             with open(str(workingDir)+'WeatherStation/conditions.json') as json_conditions_data:
                weatherconditions = json.load(json_conditions_data)
 
         forecastlabel="Today"
@@ -142,7 +145,7 @@ class images:
         else:
           noonhour=12
         noontemp=currtemp
-        tylerfile=open("/home/pi/WeatherStation/tyler.txt","w")
+        tylerfile=open(str(workingDir)+"WeatherStation/tyler.txt","w")
         timelist=[]
         epochlist=[]
         preciplist=[]
@@ -229,9 +232,9 @@ class images:
 
         # Loading Fonts.
         # To the font you want to use.
-        labelfont = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf",30)
-        temperaturefont = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf",110)
-        notefont = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSans.ttf",15)
+        labelfont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",30)
+        temperaturefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",110)
+        notefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",15)
         fontcolor=(0,0,0)
         #fontcolor=255
         degreesymbol=u"\u00b0"
