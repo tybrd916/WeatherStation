@@ -279,6 +279,9 @@ class images:
           weekdaysOffset=int(weekdaysOffset+(float(barwidth)*(18-int(firsthour))))+nightRectWidth
           dayOffset=2
 
+        if forecastlabel=="Tomorrow":
+          dayOffset=dayOffset-1
+
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
         graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
         nightRectWidth=float(barwidth)*11
