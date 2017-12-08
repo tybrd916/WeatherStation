@@ -15,6 +15,7 @@ from PIL import ImageOps
 import numpy
 import sys
 import matplotlib
+import random
 matplotlib.use("agg")
 import matplotlib.pyplot as plt
 
@@ -76,10 +77,12 @@ urls = (
   '/alex', 'Index',
   '/helenback.html', 'helenback',
   '/alexback.html', 'alexback',
+  '/unaback.html', 'unaback',
+  '/coloradoback.html', 'coloradoback',
   '/alex.png', 'images',
+  '/colorado.png', 'images',
+  '/una.png', 'images',
   '/helen.png', 'images',
-  '/helen.gif', 'images',
-  '/helen.bmp', 'images',
   '/helen', 'Index',
   '/conditions', 'Conditions', 
   '/hourly10day', 'Hourly'
@@ -90,6 +93,23 @@ app = web.application(urls, globals())
 render = web.template.render('templates/')
 
 class images:
+
+    def resolveLocation(self,imagename):
+      returnStr="VT/Williston"
+      if imagename=="/una.png":
+        returnStr="FL/Sarasota"
+      elif imagename=="/colorado.png":
+        returnStr="CO/Louisville"
+      return returnStr
+
+    def resolveLocationPrefix(self,imagename):
+      returnStr="Williston"
+      if imagename=="/una.png":
+        returnStr="Sarasota"
+      elif imagename=="/colorado.png":
+        returnStr="LouisvilleCO"
+      return returnStr
+
     def GET(self):
         ext = ".png"#name.split(".")[-1] # Gather extension
         
@@ -117,26 +137,26 @@ class images:
         downloadfreshdata=1
         now = time.time()
         #with open(str(workingDir)+'WeatherStation/hourly10day.json', 'w') as hourlyforecast10day_outfile:
-        if os.path.isfile(str(workingDir)+'WeatherStation/hourly10day.json'):
-          if os.stat(str(workingDir)+'WeatherStation/hourly10day.json').st_mtime > now - 3600:
+        if os.path.isfile(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json'):
+          if os.stat(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json').st_mtime > now - 3600:
             #print "file is new-ish, don't refresh!"
             downloadfreshdata=0
 
         print "tyler sees APIKEY = "+apikey
         if downloadfreshdata > 0 :
-        	hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
-                with open(str(workingDir)+'WeatherStation/hourly10day.json', 'w') as hourlyforecast10day_outfile:
+        	hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/"+self.resolveLocation(web.ctx.path)+".json").json()
+                with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json', 'w') as hourlyforecast10day_outfile:
                   json.dump(hourlyforecast10day, hourlyforecast10day_outfile)
 
         #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
         #    weatherconditions = json.load(json_conditions_data)
-        	weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
-                with open(str(workingDir)+'WeatherStation/conditions.json', 'w') as conditions_outfile:
+        	weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
+                with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:
                   json.dump(weatherconditions, conditions_outfile)
         else:
-             with open(str(workingDir)+'WeatherStation/hourly10day.json') as json_hourlyforecast10day_data:
+             with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json') as json_hourlyforecast10day_data:
                hourlyforecast10day = json.load(json_hourlyforecast10day_data)
-             with open(str(workingDir)+'WeatherStation/conditions.json') as json_conditions_data:
+             with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json') as json_conditions_data:
                weatherconditions = json.load(json_conditions_data)
 
         forecastlabel="Today"
@@ -216,7 +236,9 @@ class images:
         plotImage.putdata(newData)
         
         kid="WeatherGirl"
-        if str(web.ctx.path) == "/alex.png":
+        if str(web.ctx.path) == "/alex.png" or str(web.ctx.path) == "/colorado.png":
+          kid="WeatherBoy"
+        if str(web.ctx.path) == "/una.png" and bool(random.getrandbits(1)):
           kid="WeatherBoy"
         clothes=5
         testtemp=noontemp
@@ -352,11 +374,19 @@ class Hourly(object):
 
 class helenback(object):
     def GET(self):
-        return render.helenback()
+        return render.previewback("helen.png")
 
 class alexback(object):
     def GET(self):
-        return render.alexback()
+        return render.previewback("alex.png")
+
+class unaback(object):
+    def GET(self):
+        return render.previewback("una.png")
+        
+class coloradoback(object):
+    def GET(self):
+        return render.previewback("colorado.png")
 
 class Index(object):
     def GET(self):
@@ -387,7 +417,7 @@ class Index(object):
               targethigh = hourlytemp
 
         kid="helen"
-        if str(web.ctx.path) == "/alex":
+        if str(web.ctx.path) == "/alex" or str(web.ctx.path):
           kid="alex"
         clothes=5
         testtemp = currtemp

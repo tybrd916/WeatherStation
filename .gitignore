@@ -1,7 +1,8 @@
 startapp.sh
 bin/app.pyc
-conditions.json
-hourly10day.json
+*conditions.json
+*hourly10day.json
 nohup.out
 webpy.log
 tyler.txt
+.DS_Store
