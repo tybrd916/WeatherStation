@@ -301,7 +301,7 @@ class images:
         elif int(firsthour) <= 18:
           graphbackoffset=graphbackoffset+(float(barwidth)*(18-int(firsthour)))
           weekdaysOffset=int(weekdaysOffset+(float(barwidth)*(18-int(firsthour))))+nightRectWidth
-          dayOffset=2
+          #dayOffset=2
 
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
         graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
