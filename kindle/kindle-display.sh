@@ -10,6 +10,10 @@ currentState=""
 
 getImageUrl(){	
 	batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
+	if [[ "$kidname" = "helen.png" ]] ; then
+		echo "helen.php" > /mnt/us/extensions/tyler/picname.txt
+		kidname="helen.php"
+	fi
 	url="http://terry.hortondome.com/$kidname?batterylevel=$batterypercent"
 	echo $url
 }
