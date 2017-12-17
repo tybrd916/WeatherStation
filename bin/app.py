@@ -78,7 +78,9 @@ urls = (
   '/helenback.html', 'helenback',
   '/alexback.html', 'alexback',
   '/unaback.html', 'unaback',
+  '/tylerback.html', 'tylerback',
   '/coloradoback.html', 'coloradoback',
+  '/tyler.png', 'images',
   '/alex.png', 'images',
   '/colorado.png', 'images',
   '/una.png', 'images',
@@ -238,7 +240,7 @@ class images:
         kid="WeatherGirl"
         if str(web.ctx.path) == "/alex.png" or str(web.ctx.path) == "/colorado.png":
           kid="WeatherBoy"
-        if str(web.ctx.path) == "/una.png" and bool(random.getrandbits(1)):
+        if (str(web.ctx.path) == "/una.png" or str(web.ctx.path) == "/tyler.png") and bool(random.getrandbits(1)):
           kid="WeatherBoy"
         clothes=5
         testtemp=noontemp
@@ -383,6 +385,10 @@ class alexback(object):
 class unaback(object):
     def GET(self):
         return render.previewback("una.png")
+
+class tylerback(object):
+    def GET(self):
+        return render.previewback("tyler.png")
         
 class coloradoback(object):
     def GET(self):
