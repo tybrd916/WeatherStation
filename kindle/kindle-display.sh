@@ -99,6 +99,7 @@ screen_saver_update(){
 	echo "get $kidname in state ($currentState)" >> /mnt/us/kindle-display.log
 	curl $(getImageUrl) > $tmp_image 2>/dev/null
 	## 2>> /mnt/us/kindle-display.log
+        mntroot rw
 	/mnt/us/extensions/tyler/setscreensaver.sh $kidname
 	#wget -O $tmp_image $url
 	if [[ "$currentState" == "Screen Saver" ]] ; then

@@ -4,4 +4,4 @@ Then it morphed a little when I added an infographic chart of the hourly tempera
 
 Kindle shortcuts to enable usbnet:
 * touch - search for ;un
-* older - ~debugOn ;usbNetwork
+* older - ;debugOn ;un
