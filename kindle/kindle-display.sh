@@ -80,9 +80,10 @@ wait_for_state_change() {
 
 script_self_update(){
 	curl http://terry.hortondome.com/kindle-display.php > /mnt/us/extensions/tyler/newscript 2>/dev/null
+        lastline=$(tail -1 /mnt/us/extensions/tyler/newscript)
 	newmd5=$(md5sum /mnt/us/extensions/tyler/newscript|cut -d " " -f1)
 	oldmd5=$(md5sum /mnt/us/extensions/tyler/kindle-display.sh|cut -d " " -f1)
-	if [[ "$newmd5" != "$oldmd5" ]] ; then
+	if [[ "$lastline" == "#trailerline" && "$newmd5" != "$oldmd5" ]] ; then
 		#Restart this script with new version
 		date >> /mnt/us/kindle-display.log
 		echo "Restart kindle-display.sh new version ($oldmd5 vs $newmd5)" >> /mnt/us/kindle-display.log
@@ -132,3 +133,5 @@ do
 		sleepfor $sleeptime
 	fi
 done
+
+#trailerline
