@@ -23,7 +23,7 @@ fi
 
 #check if screensaver image size has changed
 destpic=`ls /usr/share/blanket/screensaver/bg*png|head -1`       
-destsize=`md5sum $destpic|cut -d" " -f 1
+destsize=`md5sum $destpic|cut -d" " -f 1`
 targetsize=`md5sum /mnt/us/extensions/tyler/$imagename|cut -d" " -f 1`
 if [[ "$destsize" != "$targetsize" ]] ; then
   #echo "different md5s refresh file"
