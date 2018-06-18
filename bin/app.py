@@ -146,15 +146,16 @@ class images:
 
         print "tyler sees APIKEY = "+apikey
         if downloadfreshdata > 0 :
-        	hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/"+self.resolveLocation(web.ctx.path)+".json").json()
+          hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/"+self.resolveLocation(web.ctx.path)+".json").json()
+          if len(hourlyforecast10day["hourly_forecast"]) > 0:
                 with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json', 'w') as hourlyforecast10day_outfile:
                   json.dump(hourlyforecast10day, hourlyforecast10day_outfile)
 
-        #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
-        #    weatherconditions = json.load(json_conditions_data)
-        	weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
-                with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:
-                  json.dump(weatherconditions, conditions_outfile)
+            #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
+            #    weatherconditions = json.load(json_conditions_data)
+                  weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
+                  with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:
+                    json.dump(weatherconditions, conditions_outfile)
         else:
              with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json') as json_hourlyforecast10day_data:
                hourlyforecast10day = json.load(json_hourlyforecast10day_data)
