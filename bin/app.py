@@ -146,16 +146,18 @@ class images:
 
         print "tyler sees APIKEY = "+apikey
         if downloadfreshdata > 0 :
-          hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/"+self.resolveLocation(web.ctx.path)+".json").json()
-          if len(hourlyforecast10day["hourly_forecast"]) > 0:
+          hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
+          #https://api.darksky.net/forecast/d299e91002f20a45070188ba289dc71a/44.4454,-73.0992
+          if len(hourlyforecast10day["hourly"]) > 0:
                 with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json', 'w') as hourlyforecast10day_outfile:
-                  json.dump(hourlyforecast10day, hourlyforecast10day_outfile)
+                  json.dump(hourlyforecast10day, hourlyforecast10day_outfile,indent=1)
 
             #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
             #    weatherconditions = json.load(json_conditions_data)
-                  weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
+                  weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
+                  #weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
                   with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:
-                    json.dump(weatherconditions, conditions_outfile)
+                    json.dump(weatherconditions, conditions_outfile,indent=1)
         else:
              with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json') as json_hourlyforecast10day_data:
                hourlyforecast10day = json.load(json_hourlyforecast10day_data)
@@ -170,7 +172,7 @@ class images:
           forecastlabel="Tomorrow"
           targetdate = targetdate + datetime.timedelta(days=1)
         targetdatestr = targetdate.strftime("%m/%d/%Y")
-        currtemp = str(weatherconditions["current_observation"]["temp_f"])
+        currtemp = str(hourlyforecast10day["hourly"]["data"][0]["temperature"])
         targethigh = -1000;
         targetlow = 1000;
         if int(currhour) > 12 and int(currhour) < 16:
@@ -183,19 +185,19 @@ class images:
         epochlist=[]
         preciplist=[]
         templist=[]
-        firsthour=hourlyforecast10day["hourly_forecast"][0]['FCTTIME']['hour_padded']
-        for i, entry in enumerate(hourlyforecast10day["hourly_forecast"]):
-          hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
+        firsthour=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(hourlyforecast10day["hourly"]["data"][0]['time'])),"%H")
+        for i, entry in enumerate(hourlyforecast10day["hourly"]["data"]):
+          hdate=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time'])),"%m/%d/%Y")
+          #hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if i <= 72:
-            timelist.append(datetime.datetime.fromtimestamp(float(entry['FCTTIME']['epoch'])))
-            epochlist.append(float(entry['FCTTIME']['epoch']))
-            preciplist.append(float(entry['pop']))
-            templist.append(float(entry['temp']['english']))
-            #tylerfile.write("Tyler sees:\n"+datetime.datetime.fromtimestamp(float(entry['FCTTIME']['epoch'])).strftime('%c'))
+            timelist.append(datetime.datetime.fromtimestamp(float(entry['time'])))
+            epochlist.append(float(entry['time']))
+            preciplist.append(float(entry['precipProbability']))
+            templist.append(float(entry['temperature']))
             tylerfile.write("Tyler sees:\n"+str(entry))
           if hdate == targetdatestr:
-            hourlytemp = entry['temp']['english']
-            if int(entry['FCTTIME']['hour_padded']) == int(noonhour):
+            hourlytemp = entry['temperature']
+            if datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time'])),"%H") == int(noonhour):
               noontemp=hourlytemp
             #print hourlytemp
             if float(hourlytemp) < float(targetlow):
