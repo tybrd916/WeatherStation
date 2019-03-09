@@ -192,7 +192,7 @@ class images:
           if i <= 72:
             timelist.append(datetime.datetime.fromtimestamp(float(entry['time'])))
             epochlist.append(float(entry['time']))
-            preciplist.append(float(entry['precipProbability']))
+            preciplist.append(float(entry['precipProbability'])*100)
             templist.append(float(entry['temperature']))
             tylerfile.write("Tyler sees:\n"+str(entry))
           if hdate == targetdatestr:
