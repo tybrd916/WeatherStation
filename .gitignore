@@ -1,4 +1,3 @@
-startapp.sh
 bin/app.pyc
 *conditions.json
 *hourly10day.json
