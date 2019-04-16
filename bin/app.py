@@ -1,6 +1,7 @@
 import web
 import time
 import datetime
+import pytz
 import json
 import requests
 import re
@@ -180,31 +181,33 @@ class images:
         else:
           noonhour=12
         noontemp=currtemp
-        tylerfile=open(str(workingDir)+"WeatherStation/tyler.txt","w")
+        #tylerfile=open(str(workingDir)+"WeatherStation/tyler.txt","w")
         timelist=[]
         epochlist=[]
         preciplist=[]
         templist=[]
-        firsthour=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(hourlyforecast10day["hourly"]["data"][0]['time'])),"%H")
+        tz = pytz.timezone('America/New_York')
+        firsthour=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(hourlyforecast10day["hourly"]["data"][0]['time']),tz),"%H")
+        #tylerfile.write("first hour: "+str(firsthour))
         for i, entry in enumerate(hourlyforecast10day["hourly"]["data"]):
-          hdate=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time'])),"%m/%d/%Y")
+          hdate=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time']),tz),"%m/%d/%Y")
           #hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if i <= 72:
-            timelist.append(datetime.datetime.fromtimestamp(float(entry['time'])))
+            nexttime=datetime.datetime.fromtimestamp(float(entry['time']),tz)
+            timelist.append(nexttime)
             epochlist.append(float(entry['time']))
             preciplist.append(float(entry['precipProbability'])*100)
             templist.append(float(entry['temperature']))
-            tylerfile.write("Tyler sees:\n"+str(entry))
+            #tylerfile.write("\n"+hdate+" Tyler sees time: "+str(nexttime.strftime("%Y-%m-%d %H:%M %z")+" precip chance: "+str(float(entry['precipProbability'])*100))+" temp: "+str(float(entry['temperature'])))
           if hdate == targetdatestr:
             hourlytemp = entry['temperature']
-            if datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time'])),"%H") == int(noonhour):
+            if datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time']),tz),"%H") == int(noonhour):
               noontemp=hourlytemp
             #print hourlytemp
             if float(hourlytemp) < float(targetlow):
               targetlow = hourlytemp
             if float(hourlytemp) > float(targethigh):
               targethigh = hourlytemp
-
         #time_format = '%Y-%m-%d %H:%M'
         #timelist2=[datetime.datetime.strftime(i, time_format) for i in timelist]
         #tylerfile.write(str(timelist)+"\n")
@@ -289,7 +292,7 @@ class images:
         #plotImage.thumbnail((200,300), Image.ANTIALIAS)
         draw = ImageDraw.Draw(im2)
 
-        barwidth=6.5
+        barwidth=9.75
         graphbackoffset=95
         weekdaysOffset=95
         dayOffset=1
