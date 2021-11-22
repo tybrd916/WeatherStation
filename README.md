@@ -6,6 +6,11 @@ Kindle shortcuts to enable usbnet:
 * touch - search for ;un
 * older - ;debugOn ;un
 
+### Crontab entry:
+- `vi /etc/crontab/root`
+- `*/1 * * * * /mnt/us/extensions/tyler/tylerd`
+- restart kindle
+
 ### Random notes about j a i l b r e a k for Kindle Keyboard K3W to install this weather display
 https://www.turnkeylinux.org/blog/kindle-root
 ;debugOn --> ~usbNetwork
