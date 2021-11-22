@@ -6,5 +6,9 @@ Kindle shortcuts to enable usbnet:
 * touch - search for ;un
 * older - ;debugOn ;un
 
-### Random notes about j a i l b r e a k for Kindle to install this weather display
+### Random notes about j a i l b r e a k for Kindle Keyboard K3W to install this weather display
 https://www.turnkeylinux.org/blog/kindle-root
+;debugOn --> ~usbNetwork
+
+### Random notes about Kindle 4 NT (Non-Touch)
+https://wiki.mobileread.com/wiki/Kindle4NTHacking#Jailbreak
