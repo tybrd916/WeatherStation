@@ -17,3 +17,8 @@ https://www.turnkeylinux.org/blog/kindle-root
 
 ### Random notes about Kindle 4 NT (Non-Touch)
 https://wiki.mobileread.com/wiki/Kindle4NTHacking#Jailbreak
+
+
+### Notes about waking Kindle more frequently to update weather
+3/13/2014 peterson:
+https://www.mobileread.com/forums/showthread.php?t=235821
