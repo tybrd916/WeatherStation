@@ -10,11 +10,11 @@ currentState=""
 
 getImageUrl(){	
 	batterypercent=$(powerd_test -s|grep "Battery Level"|cut -d " " -f 3|cut -d "%" -f 1)
-	if [[ "$kidname" = "helen.png" ]] ; then
-		echo "helen.php" > /mnt/us/extensions/tyler/picname.txt
-		kidname="helen.php"
+	if [[ "$kidname" = "tyler.php" ]] ; then
+		echo "tyler.png" > /mnt/us/extensions/tyler/picname.txt
+		kidname="tyler.png"
 	fi
-	url="http://terry.hortondome.com/$kidname?batterylevel=$batterypercent"
+	url="http://8.0.0.27:8080/$kidname?batterylevel=$batterypercent"
 	echo $url
 }
 
@@ -79,7 +79,7 @@ wait_for_state_change() {
 }
 
 script_self_update(){
-	curl http://terry.hortondome.com/kindle-display.php > /mnt/us/extensions/tyler/newscript 2>/dev/null
+	curl http://8.0.0.27:8080/static/kindle-display.sh > /mnt/us/extensions/tyler/newscript 2>/dev/null
         lastline=$(tail -1 /mnt/us/extensions/tyler/newscript)
 	newmd5=$(md5sum /mnt/us/extensions/tyler/newscript|cut -d " " -f1)
 	oldmd5=$(md5sum /mnt/us/extensions/tyler/kindle-display.sh|cut -d " " -f1)
