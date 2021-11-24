@@ -339,12 +339,12 @@ class images:
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate2.weekday()],fontcolor,font=notefont)
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate3.weekday()],fontcolor,font=notefont)
 
-        draw.text((20, 20),"Recent Temperature",fontcolor,font=labelfont)
-        draw.text((20, 50),currtemp+degreesymbol+"F",fontcolor,font=temperaturefont)
-        draw.text((20, 200),forecastlabel+" High",fontcolor,font=labelfont)
-        draw.text((20, 230),str(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
-        draw.text((20, 400),forecastlabel+" Low",fontcolor,font=labelfont)
-        draw.text((20, 430),str(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
+        #draw.text((20, 20),"Recent Temperature",fontcolor,font=labelfont)
+        #draw.text((20, 50),currtemp+degreesymbol+"F",fontcolor,font=temperaturefont)
+        draw.text((20, 20),forecastlabel+" High",fontcolor,font=labelfont)
+        draw.text((20, 50),"{:.1f}".format(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
+        draw.text((20, 180),forecastlabel+" Low",fontcolor,font=labelfont)
+        draw.text((20, 210),"{:.1f}".format(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 780),"last updated: "+currtime,fontcolor,font=notefont)
         if batterypercent != None:
           draw.text((450,780),"Battery: "+batterypercent+"%",fontcolor,font=notefont)
