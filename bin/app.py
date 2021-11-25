@@ -222,6 +222,7 @@ class images:
         axTemp = fig.add_axes([0.1, 0.05, .8, .9])
         #axPrecip.axis('off')
         axTemp.plot(templist,color="black")
+        axTemp.tick_params(labelsize=14)
 
         axPrecip = axTemp.twinx()
         y_pos = numpy.arange(len(preciplist))
@@ -274,7 +275,7 @@ class images:
         # To the font you want to use.
         labelfont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",30)
         temperaturefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",110)
-        notefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",15)
+        notefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",20)
         fontcolor=(0,0,0)
         #fontcolor=255
         degreesymbol=u"\u00b0"
