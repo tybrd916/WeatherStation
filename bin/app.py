@@ -219,8 +219,7 @@ class images:
         #print "Auto Plot attempt"
         #fig = plt.gcf()
         fig = plt.figure(figsize=(6.5,2), dpi=100, frameon=False)
-        axTemp = fig.add_axes([0.1, 0.05, .8, .9])
-        #axPrecip.axis('off')
+        axTemp = fig.add_axes([0.05, 0.03, .87, 0.93])
         axTemp.plot(templist,color="black")
         axTemp.tick_params(labelsize=14)
 
@@ -230,6 +229,9 @@ class images:
         axPrecip.set_ylim([0,100])
         
         #fig.set_size_inches(3, 1)
+        axTemp.set_aspect('auto')
+        axTemp.set_xlim([-1, 48])
+        axTemp.set_xbound(lower=-1.0, upper=48)
         fig.autofmt_xdate()
         plotImage = fig2img(fig)
         plotImage = plotImage.convert("RGBA")
@@ -293,8 +295,8 @@ class images:
         #plotImage.thumbnail((200,300), Image.ANTIALIAS)
         draw = ImageDraw.Draw(im2)
 
-        barwidth=9.75
-        graphbackoffset=95
+        barwidth=11.5
+        graphbackoffset=40
         weekdaysOffset=95
         dayOffset=1
         nightRectWidth=float(barwidth)*11
@@ -321,7 +323,7 @@ class images:
         graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
         nightRectWidth=float(barwidth)*11
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
-        im2.paste(plotImage,(5,550), mask=plotImage) #plot debug
+        im2.paste(plotImage,(0,550), mask=plotImage) #plot debug
         im2.paste(im1,(350,0), mask=im1)
 
         #Resolve battery level if passed
@@ -346,10 +348,12 @@ class images:
         draw.text((20, 50),"{:.1f}".format(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 180),forecastlabel+" Low",fontcolor,font=labelfont)
         draw.text((20, 210),"{:.1f}".format(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
+        draw.text((20, 500),str(weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["summary"]),fontcolor,font=labelfont)
         draw.text((20, 772),"last updated: "+currtime,fontcolor,font=notefont)
         if batterypercent != None:
           draw.text((450,772),"Battery: "+batterypercent+"%",fontcolor,font=notefont)
         draw = ImageDraw.Draw(im2)
+        plt.close('all')
 
         im2 = im2.convert("L")
         if batterypercent != None and batterypercent < 20:
@@ -372,13 +376,13 @@ class images:
 
 class Conditions(object):
     def GET(self):
-        weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
+        weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
 
         return json.dumps(weatherconditions)
 
 class Hourly(object):
     def GET(self):
-        hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
+        hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
 
         return json.dumps(hourlyforecast10day)
 
@@ -404,8 +408,8 @@ class coloradoback(object):
 
 class Index(object):
     def GET(self):
-        weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/VT/Williston.json").json()
-        hourlyforecast10day = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/hourly10day/q/VT/Williston.json").json()
+        weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
+        hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
 
         forecastlabel="Today"
         currhour = time.strftime("%H")
