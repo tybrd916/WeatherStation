@@ -288,6 +288,11 @@ class images:
         #http://terrylane.hopto.org:8080/helen.png
         im1.thumbnail((575,575), Image.ANTIALIAS)
 
+        # Opening the icon file
+        iconFile = "static/"+str(weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["icon"])+".png"
+        imIcon=Image.open(iconFile)
+        imIcon.thumbnail((575,575), Image.ANTIALIAS)
+
         im2=Image.new("RGBA", (600, 800), (255,255,255))
         im4=Image.new("L", (600, 800), 255)
         #print im2.mode+" "+im1.mode
@@ -325,6 +330,7 @@ class images:
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
         im2.paste(plotImage,(10,550), mask=plotImage) #plot debug
         im2.paste(im1,(350,0), mask=im1)
+        im2.paste(imIcon,(150,350))
 
         #Resolve battery level if passed
         param_data = web.input(batterylevel=None)
