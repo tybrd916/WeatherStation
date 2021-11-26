@@ -296,8 +296,8 @@ class images:
         draw = ImageDraw.Draw(im2)
 
         barwidth=11.5
-        graphbackoffset=40
-        weekdaysOffset=95
+        graphbackoffset=60
+        weekdaysOffset=85
         dayOffset=1
         nightRectWidth=float(barwidth)*11
         dayRectWidth=float(barwidth)*13
@@ -323,7 +323,7 @@ class images:
         graphbackoffset=graphbackoffset+nightRectWidth+dayRectWidth
         nightRectWidth=float(barwidth)*11
         draw.rectangle((graphbackoffset,550,graphbackoffset+nightRectWidth,750),fill="#dddddd")
-        im2.paste(plotImage,(0,550), mask=plotImage) #plot debug
+        im2.paste(plotImage,(10,550), mask=plotImage) #plot debug
         im2.paste(im1,(350,0), mask=im1)
 
         #Resolve battery level if passed
