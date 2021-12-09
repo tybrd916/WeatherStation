@@ -354,7 +354,7 @@ class images:
         draw.text((20, 50),"{:.1f}".format(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 180),forecastlabel+" Low",fontcolor,font=labelfont)
         draw.text((20, 210),"{:.1f}".format(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
-        draw.text((20, 500),str(weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["summary"]),fontcolor,font=labelfont)
+        draw.text((20, 500),unicode(weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["summary"]),fontcolor,font=labelfont)
         draw.text((20, 772),"last updated: "+currtime,fontcolor,font=notefont)
         if batterypercent != None:
           draw.text((450,772),"Battery: "+batterypercent+"%",fontcolor,font=notefont)
