@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 workingDir='/Users/tcarr/'
 
 if len(sys.argv) < 4:
-    print "You MUST supply a port and weatherunderground API key and working directory"
+    print("You MUST supply a port and weatherunderground API key and working directory")
     exit(2)
 
 apikey = sys.argv[2]
@@ -143,9 +143,9 @@ class images:
         if os.path.isfile(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json'):
           if os.stat(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json').st_mtime > now - 3600:
             #print "file is new-ish, don't refresh!"
-            downloadfreshdata=0
+            downloadfreshdata=1 #0
 
-        print "tyler sees APIKEY = "+apikey
+        print("tyler sees APIKEY = "+apikey)
         if downloadfreshdata > 0 :
           hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
           #https://api.darksky.net/forecast/d299e91002f20a45070188ba289dc71a/44.4454,-73.0992
@@ -348,13 +348,15 @@ class images:
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate2.weekday()],fontcolor,font=notefont)
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate3.weekday()],fontcolor,font=notefont)
 
+        #print(json.dumps(weatherconditions,indent=1))
+
         #draw.text((20, 20),"Recent Temperature",fontcolor,font=labelfont)
         #draw.text((20, 50),currtemp+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 20),forecastlabel+" High",fontcolor,font=labelfont)
         draw.text((20, 50),"{:.1f}".format(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 180),forecastlabel+" Low",fontcolor,font=labelfont)
         draw.text((20, 210),"{:.1f}".format(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
-        draw.text((20, 500),unicode(weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["summary"]),fontcolor,font=labelfont)
+        draw.text((20, 500),weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["summary"],fontcolor,font=labelfont)
         draw.text((20, 772),"last updated: "+currtime,fontcolor,font=notefont)
         if batterypercent != None:
           draw.text((450,772),"Battery: "+batterypercent+"%",fontcolor,font=notefont)
@@ -362,7 +364,7 @@ class images:
         plt.close('all')
 
         im2 = im2.convert("L")
-        if batterypercent != None and batterypercent < 20:
+        if batterypercent != None and float(batterypercent) < 20:
           im2 = ImageOps.mirror(im2)
         im4.paste(im2,(0,0))
         imgByteArr = io.BytesIO()
@@ -426,14 +428,18 @@ class Index(object):
           targetdate = targetdate + datetime.timedelta(days=1)
         targetdatestr = targetdate.strftime("%m/%d/%Y")
 
-        currtemp = str(weatherconditions["current_observation"]["temp_f"])
+        #print(json.dumps(hourlyforecast10day,indent=1))
+        currtemp = str(weatherconditions["currently"]["temperature"])
 
         targethigh = -1000;
         targetlow = 1000;
-        for i, entry in enumerate(hourlyforecast10day["hourly_forecast"]):
-          hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
+        #print("tyler")
+        for i, entry in enumerate(hourlyforecast10day["hourly"]["data"]):
+          #hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
+          #print(json.dumps(entry,indent=1))
+          hdate = datetime.datetime.utcfromtimestamp(int(entry["time"])).strftime('%m/%d/%Y')
           if hdate == targetdatestr:
-            hourlytemp = entry['temp']['english']
+            hourlytemp = entry['temperature']
             #print hourlytemp
             if float(hourlytemp) < float(targetlow):
               targetlow = hourlytemp
