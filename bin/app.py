@@ -147,15 +147,17 @@ class images:
 
         print("tyler sees APIKEY = "+apikey)
         if downloadfreshdata > 0 :
-          hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
+          hourlyforecast10day = requests.get("https://api.weather.gov/gridpoints/TOP/92,57/forecast/hourly").json()
+          #hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
           #https://api.darksky.net/forecast/d299e91002f20a45070188ba289dc71a/44.4454,-73.0992
-          if len(hourlyforecast10day["hourly"]) > 0:
+          if len(hourlyforecast10day["properties"]["periods"]) > 0:
                 with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json', 'w') as hourlyforecast10day_outfile:
                   json.dump(hourlyforecast10day, hourlyforecast10day_outfile,indent=1)
 
             #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
             #    weatherconditions = json.load(json_conditions_data)
-                  weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
+                  weatherconditions = requests.get("https://api.weather.gov/gridpoints/TOP/92,57/forecast").json()
+                  #weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
                   #weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
                   with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:
                     json.dump(weatherconditions, conditions_outfile,indent=1)
@@ -173,7 +175,7 @@ class images:
           forecastlabel="Tomorrow"
           targetdate = targetdate + datetime.timedelta(days=1)
         targetdatestr = targetdate.strftime("%m/%d/%Y")
-        currtemp = str(hourlyforecast10day["hourly"]["data"][0]["temperature"])
+        currtemp = str(hourlyforecast10day["properties"]["periods"][0]["temperature"])
         targethigh = -1000;
         targetlow = 1000;
         if int(currhour) > 12 and int(currhour) < 16:
@@ -183,25 +185,26 @@ class images:
         noontemp=currtemp
         #tylerfile=open(str(workingDir)+"WeatherStation/tyler.txt","w")
         timelist=[]
-        epochlist=[]
+        #epochlist=[]
         preciplist=[]
         templist=[]
         tz = pytz.timezone('America/New_York')
-        firsthour=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(hourlyforecast10day["hourly"]["data"][0]['time']),tz),"%H")
+        firsthour=datetime.datetime.strftime(datetime.datetime.fromisoformat(hourlyforecast10day["properties"]["periods"][0]['startTime']),"%H")
+        #firsthour=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(hourlyforecast10day["properties"]["periods"][0]['startTime']),tz),"%H")
         #tylerfile.write("first hour: "+str(firsthour))
-        for i, entry in enumerate(hourlyforecast10day["hourly"]["data"]):
-          hdate=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time']),tz),"%m/%d/%Y")
+        for i, entry in enumerate(hourlyforecast10day["properties"]["periods"]):
+          hdate=datetime.datetime.strftime(datetime.datetime.fromisoformat(entry['startTime']),"%m/%d/%Y")
           #hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if i <= 72:
-            nexttime=datetime.datetime.fromtimestamp(float(entry['time']),tz)
+            nexttime=datetime.datetime.fromisoformat(entry['startTime'])
             timelist.append(nexttime)
-            epochlist.append(float(entry['time']))
-            preciplist.append(float(entry['precipProbability'])*100)
+            #epochlist.append(float(entry['time']))
+            preciplist.append(float(entry['probabilityOfPrecipitation']['value']))
             templist.append(float(entry['temperature']))
             #tylerfile.write("\n"+hdate+" Tyler sees time: "+str(nexttime.strftime("%Y-%m-%d %H:%M %z")+" precip chance: "+str(float(entry['precipProbability'])*100))+" temp: "+str(float(entry['temperature'])))
           if hdate == targetdatestr:
             hourlytemp = entry['temperature']
-            if datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(entry['time']),tz),"%H") == int(noonhour):
+            if datetime.datetime.strftime(datetime.datetime.fromisoformat(entry['startTime']),"%H") == int(noonhour):
               noontemp=hourlytemp
             #print hourlytemp
             if float(hourlytemp) < float(targetlow):
@@ -288,8 +291,47 @@ class images:
         #http://terrylane.hopto.org:8080/helen.png
         im1.thumbnail((575,575), Image.ANTIALIAS)
 
+        iconMap={
+        "skc": "clear-day.png",
+        "few": "partly-cloudy-day.png",
+        "sct": "partly-cloudy-day.png",
+        "bkn": "cloudy.png",
+        "ovc": "cloudy.png",
+        "wind_skc": "wind.png",
+        "wind_few": "wind.png",
+        "wind_sct": "wind.png",
+        "wind_bkn": "wind.png",
+        "wind_ovc": "wind.png",
+        "snow": "snow.png",
+        "rain_snow": "snow.png",
+        "rain_sleet": "sleet.png",
+        "snow_sleet": "sleet.png",
+        "fzra": "rain.png",
+        "rain_fzra": "rain.png",
+        "snow_fzra": "rain.png",
+        "sleet": "sleet.png",
+        "rain": "rain.png",
+        "rain_showers": "rain.png",
+        "rain_showers_hi": "rain.png",
+        "tsra": "rain.png",
+        "tsra_sct": "rain.png",
+        "tsra_hi": "rain.png",
+        "tornado": "rain.png",
+        "hurricane": "rain.png",
+        "tropical_storm": "rain.png",
+        "dust": "fog.png",
+        "smoke": "fog.png",
+        "haze": "fog.png",
+        "hot": "clear-day.png",
+        "cold": "snow.png",
+        "blizzard": "snow.png",
+        "fog": "fog.png",
+        }
+
         # Opening the icon file
-        iconFile = "static/"+str(weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["icon"])+".png"
+        iconStr=iconMap[re.sub('^.*[/]([^/]+)[,].*$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]))]
+        print(          re.sub('^.*[/]([^/]+)[,].*$', r'\1', iconStr))
+        iconFile = "static/"+iconStr
         imIcon=Image.open(iconFile)
         imIcon.thumbnail((575,575), Image.ANTIALIAS)
 
@@ -356,7 +398,7 @@ class images:
         draw.text((20, 50),"{:.1f}".format(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 180),forecastlabel+" Low",fontcolor,font=labelfont)
         draw.text((20, 210),"{:.1f}".format(targetlow)+degreesymbol+"F",fontcolor,font=temperaturefont)
-        draw.text((20, 500),weatherconditions["daily"]["data"][0 if forecastlabel == "Today" else 1]["summary"],fontcolor,font=labelfont)
+        draw.text((20, 500),weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["shortForecast"],fontcolor,font=labelfont)
         draw.text((20, 772),"last updated: "+currtime,fontcolor,font=notefont)
         if batterypercent != None:
           draw.text((450,772),"Battery: "+batterypercent+"%",fontcolor,font=notefont)
@@ -416,6 +458,7 @@ class coloradoback(object):
 
 class Index(object):
     def GET(self):
+        # 2023-03-22: https://api.weather.gov/points/44.4726,-73.1153 to get points for National Weather API
         weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
         hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
 
