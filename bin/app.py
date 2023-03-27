@@ -203,6 +203,7 @@ class images:
             templist.append(float(entry['temperature']))
             #tylerfile.write("\n"+hdate+" Tyler sees time: "+str(nexttime.strftime("%Y-%m-%d %H:%M %z")+" precip chance: "+str(float(entry['precipProbability'])*100))+" temp: "+str(float(entry['temperature'])))
           if hdate == targetdatestr:
+            print(hdate)
             hourlytemp = entry['temperature']
             if datetime.datetime.strftime(datetime.datetime.fromisoformat(entry['startTime']),"%H") == int(noonhour):
               noontemp=hourlytemp
@@ -329,7 +330,9 @@ class images:
         }
 
         # Opening the icon file
-        iconStr=iconMap[re.sub('^.*[/]([^/]+)[,].*$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]))]
+        #print(str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]))
+        #print(re.sub('^.*[/]([^/]+)([,?].*)$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"])))
+        iconStr=iconMap[re.sub('^.*[/]([^/]+)[,?].*$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]))]
         print(          re.sub('^.*[/]([^/]+)[,].*$', r'\1', iconStr))
         iconFile = "static/"+iconStr
         imIcon=Image.open(iconFile)
