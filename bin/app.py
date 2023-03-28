@@ -330,10 +330,10 @@ class images:
         }
 
         # Opening the icon file
-        #print(str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]))
+        iconUrl=str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]).split(",")[0]
         #print(re.sub('^.*[/]([^/]+)([,?].*)$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"])))
-        iconStr=iconMap[re.sub('^.*[/]([^/]+)[,?].*$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]))]
-        print(          re.sub('^.*[/]([^/]+)[,].*$', r'\1', iconStr))
+        iconStr=iconMap[re.sub('^.*[/]([^/]+)[,?]?.*$', r'\1',iconUrl)] 
+        #print(          re.sub('^.*[/]([^/]+)[,].*$', r'\1', iconStr))
         iconFile = "static/"+iconStr
         imIcon=Image.open(iconFile)
         imIcon.thumbnail((575,575), Image.ANTIALIAS)
