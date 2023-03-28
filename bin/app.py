@@ -330,7 +330,7 @@ class images:
         }
 
         # Opening the icon file
-        iconUrl=str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]).split(",")[0]
+        iconUrl=str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]).split(",")[0].split("?")[0]
         #print(re.sub('^.*[/]([^/]+)([,?].*)$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"])))
         iconStr=iconMap[re.sub('^.*[/]([^/]+)[,?]?.*$', r'\1',iconUrl)] 
         #print(          re.sub('^.*[/]([^/]+)[,].*$', r'\1', iconStr))
