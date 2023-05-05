@@ -147,7 +147,7 @@ class images:
 
         print("tyler sees APIKEY = "+apikey)
         if downloadfreshdata > 0 :
-          hourlyforecast10day = requests.get("https://api.weather.gov/gridpoints/TOP/92,57/forecast/hourly").json()
+          hourlyforecast10day = requests.get("https://api.weather.gov/gridpoints/BTV/92,57/forecast/hourly").json()
           #hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
           #https://api.darksky.net/forecast/d299e91002f20a45070188ba289dc71a/44.4454,-73.0992
           if len(hourlyforecast10day["properties"]["periods"]) > 0:
@@ -156,7 +156,7 @@ class images:
 
             #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
             #    weatherconditions = json.load(json_conditions_data)
-                  weatherconditions = requests.get("https://api.weather.gov/gridpoints/TOP/92,57/forecast").json()
+                  weatherconditions = requests.get("https://api.weather.gov/gridpoints/BTV/92,57/forecast").json()
                   #weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
                   #weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
                   with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:

@@ -1,3 +1,5 @@
 web.py
 requests
 pillow
+pytz
+matplotlib
