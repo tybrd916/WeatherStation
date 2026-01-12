@@ -198,7 +198,6 @@ def serve_image(imagename):
             newData.append((255, 255, 255, 0))
         else:
             newData.append(item)
-    print("Tyler A")
     
     plotImage.putdata(newData)
         
@@ -221,23 +220,18 @@ def serve_image(imagename):
         clothes="_Over60.png"
     elif float(testtemp) >= 50:
         clothes="_Over50.png"
-    print("Tyler B")
 
     labelfont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",30)
     temperaturefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",110)
     notefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",20)
     fontcolor=(0,0,0)
     degreesymbol=u"\u00b0"
-    print("Tyler C")
 
     # Opening the file gg.png
     imageFile = str(workingDir)+"WeatherStation/static/"+kid+clothes
-    print("Tyler D", imageFile)
     im1=Image.open(imageFile)
-    print("Tyler E", im1)
     #http://terrylane.hopto.org:8080/helen.png
     im1.thumbnail((575,575), Image.Resampling.LANCZOS)
-    print("Tyler F", im1)
 
     iconMap={
     "skc": "clear-day.png",
