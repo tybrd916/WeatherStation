@@ -42,7 +42,7 @@ def fig2data(fig):
 
     # Get the RGBA buffer from the figure
     w, h = fig.canvas.get_width_height()
-    buf = numpy.fromstring(fig.canvas.tostring_argb(), dtype=numpy.uint8)
+    buf = numpy.frombuffer(fig.canvas.tostring_argb(), dtype=numpy.uint8)
     buf.shape = (w, h, 4)
 
     # canvas.tostring_argb give pixmap in ARGB mode.
@@ -59,7 +59,7 @@ def fig2img ( fig ):
     # put the figure pixmap into a numpy array
     buf = fig2data ( fig )
     w, h, d = buf.shape
-    return Image.frombytes( "RGBA", ( w ,h ), buf.tostring( ) )
+    return Image.frombytes( "RGBA", ( w ,h ), buf.tobytes( ) )
 
 #requests_cache.install_cache('weatherunderground_cache', backend='sqlite', expire_after=1800)
 
@@ -75,7 +75,6 @@ weekday_abbrevs = [
 
 urls = (
   '/', 'Index', 
-  '/alex', 'Index',
   '/helenback.html', 'helenback',
   '/alexback.html', 'alexback',
   '/unaback.html', 'unaback',
@@ -86,9 +85,6 @@ urls = (
   '/colorado.png', 'images',
   '/una.png', 'images',
   '/helen.png', 'images',
-  '/helen', 'Index',
-  '/conditions', 'Conditions', 
-  '/hourly10day', 'Hourly'
 )
 
 app = web.application(urls, globals())
@@ -148,17 +144,11 @@ class images:
         print("tyler sees APIKEY = "+apikey)
         if downloadfreshdata > 0 :
           hourlyforecast10day = requests.get("https://api.weather.gov/gridpoints/BTV/92,57/forecast/hourly").json()
-          #hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
-          #https://api.darksky.net/forecast/d299e91002f20a45070188ba289dc71a/44.4454,-73.0992
           if len(hourlyforecast10day["properties"]["periods"]) > 0:
                 with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'hourly10day.json', 'w') as hourlyforecast10day_outfile:
                   json.dump(hourlyforecast10day, hourlyforecast10day_outfile,indent=1)
 
-            #with open('/Users/tcarr/WeatherStation/conditions.json') as json_conditions_data:
-            #    weatherconditions = json.load(json_conditions_data)
                   weatherconditions = requests.get("https://api.weather.gov/gridpoints/BTV/92,57/forecast").json()
-                  #weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
-                  #weatherconditions = requests.get("http://api.wunderground.com/api/"+apikey+"/geolookup/conditions/q/"+self.resolveLocation(web.ctx.path)+".json").json()
                   with open(str(workingDir)+'WeatherStation/'+self.resolveLocationPrefix(web.ctx.path)+'conditions.json', 'w') as conditions_outfile:
                     json.dump(weatherconditions, conditions_outfile,indent=1)
         else:
@@ -183,22 +173,16 @@ class images:
         else:
           noonhour=12
         noontemp=currtemp
-        #tylerfile=open(str(workingDir)+"WeatherStation/tyler.txt","w")
         timelist=[]
-        #epochlist=[]
         preciplist=[]
         templist=[]
         tz = pytz.timezone('America/New_York')
         firsthour=datetime.datetime.strftime(datetime.datetime.fromisoformat(hourlyforecast10day["properties"]["periods"][0]['startTime']),"%H")
-        #firsthour=datetime.datetime.strftime(datetime.datetime.fromtimestamp(int(hourlyforecast10day["properties"]["periods"][0]['startTime']),tz),"%H")
-        #tylerfile.write("first hour: "+str(firsthour))
         for i, entry in enumerate(hourlyforecast10day["properties"]["periods"]):
           hdate=datetime.datetime.strftime(datetime.datetime.fromisoformat(entry['startTime']),"%m/%d/%Y")
-          #hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
           if i <= 72:
             nexttime=datetime.datetime.fromisoformat(entry['startTime'])
             timelist.append(nexttime)
-            #epochlist.append(float(entry['time']))
             preciplist.append(float(entry['probabilityOfPrecipitation']['value']))
             templist.append(float(entry['temperature']))
             #tylerfile.write("\n"+hdate+" Tyler sees time: "+str(nexttime.strftime("%Y-%m-%d %H:%M %z")+" precip chance: "+str(float(entry['precipProbability'])*100))+" temp: "+str(float(entry['temperature'])))
@@ -212,16 +196,6 @@ class images:
               targetlow = hourlytemp
             if float(hourlytemp) > float(targethigh):
               targethigh = hourlytemp
-        #time_format = '%Y-%m-%d %H:%M'
-        #timelist2=[datetime.datetime.strftime(i, time_format) for i in timelist]
-        #tylerfile.write(str(timelist)+"\n")
-        #tylerfile.write(str(preciplist)+"\n")
-        #print "Before Plot attempt"
-        ##plt = None
-        ##plt = matplotlib.pyplot
-        #plt.plot(timelist, preciplist)
-        #print "Auto Plot attempt"
-        #fig = plt.gcf()
         fig = plt.figure(figsize=(6.5,2), dpi=100, frameon=False)
         axTemp = fig.add_axes([0.05, 0.03, .87, 0.93])
         axTemp.plot(templist,color="black")
@@ -247,6 +221,7 @@ class images:
                 newData.append((255, 255, 255, 0))
             else:
                 newData.append(item)
+        print("Tyler A")
         
         plotImage.putdata(newData)
         
@@ -257,13 +232,6 @@ class images:
           kid="WeatherBoy"
         clothes=5
         testtemp=noontemp
-        #testtemp = currtemp
-        #if int(currhour) > 16:
-        #  if float(targetlow) < 45:
-        #    testtemp = targetlow
-        #  else:
-        #    testtemp = targethigh
-        #print testtemp
         if float(testtemp) < 35:
           clothes="_Under35.png"
         elif float(testtemp) < 50:
@@ -276,21 +244,23 @@ class images:
           clothes="_Over60.png"
         elif float(testtemp) >= 50:
           clothes="_Over50.png"
+        print("Tyler B")
 
-        # Loading Fonts.
-        # To the font you want to use.
         labelfont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",30)
         temperaturefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",110)
         notefont = ImageFont.truetype(str(workingDir)+"WeatherStation/static/FreeSans.ttf",20)
         fontcolor=(0,0,0)
-        #fontcolor=255
         degreesymbol=u"\u00b0"
+        print("Tyler C")
 
         # Opening the file gg.png
         imageFile = "static/"+kid+clothes
+        print("Tyler D", imageFile)
         im1=Image.open(imageFile)
+        print("Tyler E", im1)
         #http://terrylane.hopto.org:8080/helen.png
-        im1.thumbnail((575,575), Image.ANTIALIAS)
+        im1.thumbnail((575,575), Image.Resampling.LANCZOS)
+        print("Tyler F", im1)
 
         iconMap={
         "skc": "clear-day.png",
@@ -331,18 +301,13 @@ class images:
 
         # Opening the icon file
         iconUrl=str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"]).split(",")[0].split("?")[0]
-        #print(re.sub('^.*[/]([^/]+)([,?].*)$', r'\1', str(weatherconditions["properties"]["periods"][0 if forecastlabel == "Today" else 1]["icon"])))
         iconStr=iconMap[re.sub('^.*[/]([^/]+)[,?]?.*$', r'\1',iconUrl)] 
-        #print(          re.sub('^.*[/]([^/]+)[,].*$', r'\1', iconStr))
         iconFile = "static/"+iconStr
         imIcon=Image.open(iconFile)
-        imIcon.thumbnail((575,575), Image.ANTIALIAS)
+        imIcon.thumbnail((575,575), Image.Resampling.LANCZOS)
 
         im2=Image.new("RGBA", (600, 800), (255,255,255))
         im4=Image.new("L", (600, 800), 255)
-        #print im2.mode+" "+im1.mode
-        #im2.paste(im1,(300,100))
-        #plotImage.thumbnail((200,300), Image.ANTIALIAS)
         draw = ImageDraw.Draw(im2)
 
         barwidth=11.5
@@ -393,10 +358,6 @@ class images:
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate2.weekday()],fontcolor,font=notefont)
         draw.text((int(weekdaysOffset+nightRectWidth+dayRectWidth+nightRectWidth+dayRectWidth)+30,750),weekday_abbrevs[labeldate3.weekday()],fontcolor,font=notefont)
 
-        #print(json.dumps(weatherconditions,indent=1))
-
-        #draw.text((20, 20),"Recent Temperature",fontcolor,font=labelfont)
-        #draw.text((20, 50),currtemp+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 20),forecastlabel+" High",fontcolor,font=labelfont)
         draw.text((20, 50),"{:.1f}".format(targethigh)+degreesymbol+"F",fontcolor,font=temperaturefont)
         draw.text((20, 180),forecastlabel+" Low",fontcolor,font=labelfont)
@@ -421,24 +382,6 @@ class images:
           im2.save(imgByteArr, format='PNG')
         return imgByteArr.getvalue()
 
-        # Save the image with a new name
-        #return im2
-        #im2.save("base_marked.png")
-        #else:
-        #    raise web.notfound()
-
-class Conditions(object):
-    def GET(self):
-        weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
-
-        return json.dumps(weatherconditions)
-
-class Hourly(object):
-    def GET(self):
-        hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
-
-        return json.dumps(hourlyforecast10day)
-
 class helenback(object):
     def GET(self):
         return render.previewback("helen.png")
@@ -458,68 +401,6 @@ class tylerback(object):
 class coloradoback(object):
     def GET(self):
         return render.previewback("colorado.png")
-
-class Index(object):
-    def GET(self):
-        # 2023-03-22: https://api.weather.gov/points/44.4726,-73.1153 to get points for National Weather API
-        weatherconditions = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
-        hourlyforecast10day = requests.get("https://api.darksky.net/forecast/"+apikey+"/44.4454,-73.0992").json()
-
-        forecastlabel="Today"
-        currhour = time.strftime("%H")
-        currtime = time.strftime("%I:%M %p")
-        targetdate = datetime.datetime.strptime(time.strftime("%m/%d/%Y"),"%m/%d/%Y")
-        if int(currhour) > 16:
-          forecastlabel="Tomorrow"
-          targetdate = targetdate + datetime.timedelta(days=1)
-        targetdatestr = targetdate.strftime("%m/%d/%Y")
-
-        #print(json.dumps(hourlyforecast10day,indent=1))
-        currtemp = str(weatherconditions["currently"]["temperature"])
-
-        targethigh = -1000;
-        targetlow = 1000;
-        #print("tyler")
-        for i, entry in enumerate(hourlyforecast10day["hourly"]["data"]):
-          #hdate = entry['FCTTIME']['mon_padded']+"/"+entry['FCTTIME']['mday_padded']+"/"+entry['FCTTIME']['year']
-          #print(json.dumps(entry,indent=1))
-          hdate = datetime.datetime.utcfromtimestamp(int(entry["time"])).strftime('%m/%d/%Y')
-          if hdate == targetdatestr:
-            hourlytemp = entry['temperature']
-            #print hourlytemp
-            if float(hourlytemp) < float(targetlow):
-              targetlow = hourlytemp
-            if float(hourlytemp) > float(targethigh):
-              targethigh = hourlytemp
-
-        kid="helen"
-        if str(web.ctx.path) == "/alex" or str(web.ctx.path):
-          kid="alex"
-        clothes=5
-        testtemp = currtemp
-
-        if int(currhour) > 16:
-          if float(targetlow) < 45:
-            testtemp = targetlow
-          else:
-            testtemp = targethigh
-
-        #print testtemp
-
-        if float(testtemp) < 35:
-          clothes=1
-        elif float(testtemp) < 50:
-          clothes=2
-        elif float(testtemp) >= 50:
-          clothes=3
-        elif float(testtemp) >= 60:
-          clothes=4
-        elif float(testtemp) >= 65:
-          clothes=5
-        elif float(testtemp) >= 80:
-          clothes=6
-
-        return render.weatherstation(currtime,currtemp,forecastlabel,targethigh,targetlow,kid,clothes)
 
 if __name__ == "__main__":
 
