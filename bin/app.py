@@ -1,4 +1,4 @@
-from flask import Flask, send_file, render_template, request
+from flask import Flask, send_file, render_template, request, redirect
 import time
 import datetime
 import pytz
@@ -352,6 +352,10 @@ def serve_image(imagename):
     
     mimetype = cType.get(ext[1:], 'image/png')
     return send_file(imgByteArr, mimetype=mimetype)
+
+@app.route('/')
+def index():
+    return redirect('/tylerback.html')
 
 @app.route('/helenback.html')
 def helenback():
